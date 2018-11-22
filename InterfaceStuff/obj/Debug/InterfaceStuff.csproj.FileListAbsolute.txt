@@ -1,0 +1,10 @@
+C:\Users\Алескандр\source\repos\InterfaceStuff\InterfaceStuff\bin\Debug\InterfaceStuff.exe.config
+C:\Users\Алескандр\source\repos\InterfaceStuff\InterfaceStuff\bin\Debug\InterfaceStuff.exe
+C:\Users\Алескандр\source\repos\InterfaceStuff\InterfaceStuff\bin\Debug\InterfaceStuff.pdb
+C:\Users\Алескандр\source\repos\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.csprojResolveAssemblyReference.cache
+C:\Users\Алескандр\source\repos\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.Form1.resources
+C:\Users\Алескандр\source\repos\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.Properties.Resources.resources
+C:\Users\Алескандр\source\repos\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.csproj.GenerateResource.Cache
+C:\Users\Алескандр\source\repos\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.csproj.CoreCompileInputs.cache
+C:\Users\Алескандр\source\repos\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.exe
+C:\Users\Алескандр\source\repos\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.pdb
