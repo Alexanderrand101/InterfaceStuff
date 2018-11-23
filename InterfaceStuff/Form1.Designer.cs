@@ -48,12 +48,12 @@
             this.label1 = new System.Windows.Forms.Label();
             this.portName = new System.Windows.Forms.ComboBox();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.button5 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.panel4 = new System.Windows.Forms.Panel();
-            this.label3 = new System.Windows.Forms.Label();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.button5 = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -264,6 +264,16 @@
             this.panel3.Size = new System.Drawing.Size(228, 408);
             this.panel3.TabIndex = 4;
             // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(75, 217);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(75, 23);
+            this.button5.TabIndex = 3;
+            this.button5.Text = "button5";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
             // button4
             // 
             this.button4.Location = new System.Drawing.Point(75, 138);
@@ -293,15 +303,6 @@
             this.panel4.Size = new System.Drawing.Size(244, 408);
             this.panel4.TabIndex = 5;
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(69, 69);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(99, 13);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "Пихай сюды вещи";
-            // 
             // chart1
             // 
             chartArea1.AxisX.Minimum = 0D;
@@ -316,15 +317,14 @@
             this.chart1.TabIndex = 1;
             this.chart1.Text = "chart1";
             // 
-            // button5
+            // label3
             // 
-            this.button5.Location = new System.Drawing.Point(75, 217);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(75, 23);
-            this.button5.TabIndex = 3;
-            this.button5.Text = "button5";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(69, 69);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(99, 13);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "Пихай сюды вещи";
             // 
             // Form1
             // 

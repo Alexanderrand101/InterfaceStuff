@@ -17,10 +17,12 @@ namespace InterfaceStuff
     {
         private SerialPort comport = new SerialPort();
         private ManualResetEvent buffFull = new ManualResetEvent(false);
+        private Semaphore semaphore = new Semaphore(1, 1);
         private byte[] dataBuffer;
         private String[] baudRates = { "9600" };//хз надо ли другие. если попросит добавим
         private Dictionary<string, string> devAdr;
         private int defaultWaitTime = 50;
+        private bool signalOn = false;
 
         public Form1()
         {
@@ -78,8 +80,8 @@ namespace InterfaceStuff
             }
             else
             {
-                comport.PortName = portName.SelectedText;
-                comport.BaudRate = int.Parse(baudRate.SelectedText);
+                comport.PortName = portName.SelectedItem.ToString();
+                comport.BaudRate = int.Parse(baudRate.SelectedItem.ToString());
                 comport.DataBits = 8;
                 comport.StopBits = StopBits.One;
                 comport.Parity = Parity.None;
@@ -115,12 +117,14 @@ namespace InterfaceStuff
         private void button1_Click(object sender, EventArgs e)
         {
             string msg = rawInput.Text;
+            semaphore.WaitOne();
             buffFull.Reset();
             writeToPort(msg);
             if (!buffFull.WaitOne(defaultWaitTime * 10))
             {
                 AddInputHistoryMessage("ничего не пришло", outputEcho);
             }
+            semaphore.Release();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -151,6 +155,7 @@ namespace InterfaceStuff
             {
                 result = setADCValue(values[i]);
                 if (!result) return result;
+                System.Threading.Thread.Sleep(40);
                 double value = 0;
                 result = getCDAValue(6, out value);//на картинке у нас 6ой но хз. мб скажет конфигить
                 //тыкай точку на график.
@@ -161,6 +166,8 @@ namespace InterfaceStuff
 
         private bool getCDAValue(int channel, out double value)
         {
+            semaphore.WaitOne();
+            buffFull.Reset();
             writeToPort(readСDAChannelCommand(devAdr["7018"], channel));
             if (buffFull.WaitOne(defaultWaitTime))
             {
@@ -175,6 +182,7 @@ namespace InterfaceStuff
                     return true;
                 }
             }
+            semaphore.Release();
             AddInputHistoryMessage("Ошибка при чтении значения c канала " + channel.ToString() + " ЦАП\n", outputEcho);
             value = 0;
             return false;
@@ -188,21 +196,31 @@ namespace InterfaceStuff
         private bool setADCValue(double value)
         {
             string val = String.Format("{0,6:F3}", value);
+            semaphore.WaitOne();
+            buffFull.Reset();
             writeToPort(setADCValueCommand(devAdr["7021"], val));
             if(buffFull.WaitOne(defaultWaitTime))
             {
                 if ((char)dataBuffer[0] == '>')
                 {
                     AddInputHistoryMessage("На АЦП установлено значение "+ val + "\n", outputEcho);
+                    semaphore.Release();
                     return true;
                 }
                 if ((char)dataBuffer[0] == '?')
                 {
-                    //тут надо тред на импульс запустить. но я тут еще не все продумал
+                    if (!signalOn)
+                    {
+                        signalOn = true;
+                        Thread thread = new Thread(new ThreadStart(formSignal));
+                        thread.Start();
+                    }
                     AddInputHistoryMessage("На АЦП превышен допустимый диапазон " + val + "\n", outputEcho);
+                    semaphore.Release();
                     return true;
                 }
             }
+            semaphore.Release();
             AddInputHistoryMessage("Ошибка при установке значения" + val + "на АЦП\n", outputEcho);
             return false;
         }
@@ -214,15 +232,19 @@ namespace InterfaceStuff
 
         private bool configADC()
         {
+            semaphore.WaitOne();
+            buffFull.Reset();
             writeToPort(config10Command(devAdr["7021"]));
             if (buffFull.WaitOne(defaultWaitTime))
             {
                 if((char)dataBuffer[0] == '!')
                 {
                     AddInputHistoryMessage("АЦП установлен в режим 10В\n", outputEcho);
+                    semaphore.Release();
                     return true;
                 }
             }
+            semaphore.Release();
             AddInputHistoryMessage("Ошибка при установке АЦП в режим 10В\n", outputEcho);
             return false;
         }
@@ -230,14 +252,21 @@ namespace InterfaceStuff
         private bool configCDA()
         {
             //возможно надо как-то сконфигурировать 0 и диапазон. но вроде и так норм было
+            semaphore.WaitOne();
+            buffFull.Reset();
             writeToPort(turnChannelsOnOff(devAdr["7018"]));
             if (buffFull.WaitOne(defaultWaitTime))
             {
                 if ((char)dataBuffer[0] == '!')
                 {
                     AddInputHistoryMessage("Входные каналы ЦАП включены\n", outputEcho);
+                    semaphore.Release();
                     return true;
                 }
+            }
+            else
+            {
+                semaphore.Release();
             }
             AddInputHistoryMessage("Ошибка при включнении входных каналов ЦАП\n", outputEcho);
             return false;
@@ -249,14 +278,89 @@ namespace InterfaceStuff
             return '$' + adr + '5' + "FF"; 
         }
 
+        private void formSignal()
+        {
+            semaphore.WaitOne();
+            buffFull.Reset();
+            writeToPort(turnOnChannel(devAdr["7044"], 7));
+            if (buffFull.WaitOne(defaultWaitTime))
+            {
+                if ((char)dataBuffer[0] == '>')
+                {
+                    AddInputHistoryMessage("Лампочка включена\n", outputEcho);
+                }
+                else
+                {
+                    AddInputHistoryMessage("Лампочка не включена\n", outputEcho);
+                }
+            }
+            else
+            {
+                AddInputHistoryMessage("Лампочка не включена\n", outputEcho);
+            }
+            semaphore.Release();
+
+            semaphore.WaitOne();
+            buffFull.Reset();
+            writeToPort(turnOnChannel(devAdr["7044"], 6));
+            if (buffFull.WaitOne(defaultWaitTime))
+            {
+                if ((char)dataBuffer[0] == '>')
+                {
+                    AddInputHistoryMessage("Уровень установлен\n", outputEcho);
+                }
+                else
+                {
+                    AddInputHistoryMessage("Уровень не установлен\n", outputEcho);
+                }
+            }
+            else
+            {
+                AddInputHistoryMessage("Уровень не установлен\n", outputEcho);
+            }
+            semaphore.Release();
+            System.Threading.Thread.Sleep(5000);
+            semaphore.WaitOne();
+            buffFull.Reset();
+            writeToPort(turnOffChannel(devAdr["7044"], 6));
+            if (buffFull.WaitOne(defaultWaitTime))
+            {
+                if ((char)dataBuffer[0] == '>')
+                {
+                    AddInputHistoryMessage("Уровень сброшен\n", outputEcho);
+                }
+                else
+                {
+                    AddInputHistoryMessage("Уровень не сброшен\n", outputEcho);
+                }
+            }
+            else
+            {
+                AddInputHistoryMessage("Уровень не сброшен\n", outputEcho);
+            }
+            semaphore.Release();
+            signalOn = false;
+        }
+
         private string config10Command(string adr)
         {
             return '$' + adr + '7';
         }
 
+        private string turnOnChannel(string adr, int channel)
+        {
+            return '$' + adr + '0' + channel.ToString() + "01";
+        }
+
+        private string turnOffChannel(string adr, int channel)
+        {
+            return '$' + adr + '0' + channel.ToString() + "00";
+        }
+
         private bool searchAndIdentify(){
             for(int i = 0; i < 256; i++){
                 string adr = intToHexString(i);
+                semaphore.WaitOne();
                 buffFull.Reset();
                 writeToPort(askNameCommand(adr));
                 if (buffFull.WaitOne(defaultWaitTime))
@@ -269,6 +373,11 @@ namespace InterfaceStuff
                         devAdr.Add(name, adr);
                     }
                 }
+                else
+                {
+                    buffFull.Set();
+                }
+                semaphore.Release();
                 if (devAdr.ContainsKey("7021") && devAdr.ContainsKey("7044") && devAdr.ContainsKey("7018"))
                 {
                     AddInputHistoryMessage("Модули найдены\n", outputEcho);
