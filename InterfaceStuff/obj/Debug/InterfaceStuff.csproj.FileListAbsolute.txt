@@ -8,3 +8,13 @@ C:\Users\Алескандр\source\repos\InterfaceStuff\InterfaceStuff\obj\Debug
 C:\Users\Алескандр\source\repos\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.csproj.CoreCompileInputs.cache
 C:\Users\Алескандр\source\repos\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.exe
 C:\Users\Алескандр\source\repos\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.pdb
+C:\Users\Vladislav\Documents\GitHub\InterfaceStuff\InterfaceStuff\bin\Debug\InterfaceStuff.exe.config
+C:\Users\Vladislav\Documents\GitHub\InterfaceStuff\InterfaceStuff\bin\Debug\InterfaceStuff.exe
+C:\Users\Vladislav\Documents\GitHub\InterfaceStuff\InterfaceStuff\bin\Debug\InterfaceStuff.pdb
+C:\Users\Vladislav\Documents\GitHub\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.csprojAssemblyReference.cache
+C:\Users\Vladislav\Documents\GitHub\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.Form1.resources
+C:\Users\Vladislav\Documents\GitHub\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.Properties.Resources.resources
+C:\Users\Vladislav\Documents\GitHub\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.csproj.GenerateResource.cache
+C:\Users\Vladislav\Documents\GitHub\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.csproj.CoreCompileInputs.cache
+C:\Users\Vladislav\Documents\GitHub\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.exe
+C:\Users\Vladislav\Documents\GitHub\InterfaceStuff\InterfaceStuff\obj\Debug\InterfaceStuff.pdb

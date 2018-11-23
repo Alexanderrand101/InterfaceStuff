@@ -30,6 +30,7 @@ namespace InterfaceStuff
             baudRate.Items.AddRange(baudRates);
             baudRate.SelectedIndex = 0;
             comport.DataReceived += new SerialDataReceivedEventHandler(port_DataRecived);
+            chart1.Series[0].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
         }
 
         private void port_DataRecived(object sender, SerialDataReceivedEventArgs e)
@@ -293,6 +294,23 @@ namespace InterfaceStuff
         private char bitsToHexChar(int i)
         {
             return (i < 10) ? (char)(i + '0') : (char)(i - 10 + 'A');
+        }
+
+        private void update(double[] values)//графикообновитель
+        {
+            chart1.Series[0].Points.Clear();
+            for (int i = 0; i < values.Length; i++)
+                chart1.Series[0].Points.AddXY(i,values[i]);
+        }
+
+   
+        private void button5_Click(object sender, EventArgs e)//нахер не надо, но потестить рисовалду прикольно
+        {
+            Random rand = new Random();
+            double[] array = new double[rand.Next(50)];            
+            for (int i = 0; i < array.Length; i++)
+                array[i] = rand.Next(10);
+            update(array);
         }
     }
 }
