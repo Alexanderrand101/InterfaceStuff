@@ -54,6 +54,7 @@
             this.panel4 = new System.Windows.Forms.Panel();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.label3 = new System.Windows.Forms.Label();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.panel1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -295,6 +296,7 @@
             // 
             // panel4
             // 
+            this.panel4.Controls.Add(this.richTextBox1);
             this.panel4.Controls.Add(this.chart1);
             this.panel4.Controls.Add(this.label3);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -313,7 +315,7 @@
             series1.ChartArea = "ChartArea1";
             series1.Name = "Series1";
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(235, 212);
+            this.chart1.Size = new System.Drawing.Size(235, 181);
             this.chart1.TabIndex = 1;
             this.chart1.Text = "chart1";
             // 
@@ -325,6 +327,14 @@
             this.label3.Size = new System.Drawing.Size(99, 13);
             this.label3.TabIndex = 0;
             this.label3.Text = "Пихай сюды вещи";
+            // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Location = new System.Drawing.Point(3, 191);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(235, 192);
+            this.richTextBox1.TabIndex = 2;
+            this.richTextBox1.Text = "";
             // 
             // Form1
             // 
@@ -384,6 +394,7 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.RichTextBox richTextBox1;
     }
 }
 

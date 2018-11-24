@@ -18,10 +18,10 @@ namespace InterfaceStuff
         private SerialPort comport = new SerialPort();
         private ManualResetEvent buffFull = new ManualResetEvent(false);
         private Semaphore semaphore = new Semaphore(1, 1);
-        private byte[] dataBuffer;
+        private volatile byte[] dataBuffer;
         private String[] baudRates = { "9600" };//хз надо ли другие. если попросит добавим
-        private Dictionary<string, string> devAdr;
-        private int defaultWaitTime = 50;
+        private Dictionary<string, string> devAdr = new Dictionary<string, string>();
+        private int defaultWaitTime = 700;
         private bool signalOn = false;
 
         public Form1()
@@ -37,11 +37,10 @@ namespace InterfaceStuff
 
         private void port_DataRecived(object sender, SerialDataReceivedEventArgs e)
         {
+            System.Threading.Thread.Sleep(200);
             dataBuffer = new byte[comport.BytesToRead];
             comport.Read(dataBuffer, 0, dataBuffer.Length);
-            for (int i = 0; i < dataBuffer.Length; i++)
-                AddInputHistoryMessage(((char)dataBuffer[i]).ToString(), outputEcho);
-            comport.DiscardInBuffer();
+            comport.DiscardOutBuffer();
             buffFull.Set();//должно быть норм.хз чебудет если set на уже открытый эвент вызвать. так то у нас всегда есть while
         }
 
@@ -68,8 +67,8 @@ namespace InterfaceStuff
         private void writeToPort(String msg)
         {
             comport.WriteLine(msg + (char)0x0D);
-            AddInputHistoryMessage(msg + '\n', outputEcho);
-            comport.DiscardOutBuffer();
+            //AddInputHistoryMessage(msg + '\n', outputEcho);
+            comport.DiscardInBuffer();
         }
 
         private void initPort()
@@ -86,7 +85,7 @@ namespace InterfaceStuff
                 comport.StopBits = StopBits.One;
                 comport.Parity = Parity.None;
                 comport.Handshake = Handshake.None;
-                comport.ReceivedBytesThreshold = 8;
+                comport.ReceivedBytesThreshold = 1;
                 comport.WriteBufferSize = 20;
                 comport.ReadBufferSize = 20;
                 comport.ReadTimeout = -1;
@@ -120,7 +119,14 @@ namespace InterfaceStuff
             semaphore.WaitOne();
             buffFull.Reset();
             writeToPort(msg);
-            if (!buffFull.WaitOne(defaultWaitTime * 10))
+            if (buffFull.WaitOne(defaultWaitTime))
+            {
+                string recived = "";
+                for (int j = 0; j < dataBuffer.Length; j++)
+                    recived += (char)dataBuffer[j];
+                AddInputHistoryMessage(recived + '\n', outputEcho);                
+            }
+            else
             {
                 AddInputHistoryMessage("ничего не пришло", outputEcho);
             }
@@ -144,9 +150,10 @@ namespace InterfaceStuff
 
         private bool launch()
         {
-            bool result = searchAndIdentify();
-            if (!result) return result;
-            result = configADC();
+            bool result = false;
+            result = searchAndIdentify();
+            //if (!result) return result;
+            //result = configADC();
             if (!result) return result;
             result = configCDA();
             double[] arguments = new double[10];// а тут пусть сформируется массив сил тока.
@@ -230,31 +237,31 @@ namespace InterfaceStuff
             return '#' + adr + val;
         }
 
-        private bool configADC()
-        {
-            semaphore.WaitOne();
-            buffFull.Reset();
-            writeToPort(config10Command(devAdr["7021"]));
-            if (buffFull.WaitOne(defaultWaitTime))
-            {
-                if((char)dataBuffer[0] == '!')
-                {
-                    AddInputHistoryMessage("АЦП установлен в режим 10В\n", outputEcho);
-                    semaphore.Release();
-                    return true;
-                }
-            }
-            semaphore.Release();
-            AddInputHistoryMessage("Ошибка при установке АЦП в режим 10В\n", outputEcho);
-            return false;
-        }
+        //private bool configADC()
+        //{
+        //    semaphore.WaitOne();
+        //    buffFull.Reset();
+        //    writeToPort(config10Command(devAdr["7021"]));
+        //    if (buffFull.WaitOne(defaultWaitTime))
+        //    {
+        //        if((char)dataBuffer[0] == '!')
+        //        {
+        //            AddInputHistoryMessage("АЦП установлен в режим 10В\n", outputEcho);
+        //            semaphore.Release();
+        //            return true;
+        //        }
+        //    }
+        //    semaphore.Release();
+        //    AddInputHistoryMessage("Ошибка при установке АЦП в режим 10В\n", outputEcho);
+        //    return false;
+        //}
 
         private bool configCDA()
         {
             //возможно надо как-то сконфигурировать 0 и диапазон. но вроде и так норм было
             semaphore.WaitOne();
             buffFull.Reset();
-            writeToPort(turnChannelsOnOff(devAdr["7018"]));
+            writeToPort(turnChannelsOnOff(devAdr["7018P"]));
             if (buffFull.WaitOne(defaultWaitTime))
             {
                 if ((char)dataBuffer[0] == '!')
@@ -368,17 +375,20 @@ namespace InterfaceStuff
                     if((char)dataBuffer[0] == '!')
                     {
                         string name = "";
-                        for (int j = 3; j < dataBuffer.Length; j++)
+                        string recived = "";
+                        for (int j = 3; j < dataBuffer.Length - 1; j++)
                             name += (char)dataBuffer[j];
                         devAdr.Add(name, adr);
+                        AddInputHistoryMessage("found device " + name + " with adr " + adr +  '\n', outputEcho);
+                        for (int j = 0; j < dataBuffer.Length; j++)
+                            recived += (char)dataBuffer[j];
+                        AddInputHistoryMessage(recived + '\n', outputEcho);
+
                     }
                 }
-                else
-                {
-                    buffFull.Set();
-                }
                 semaphore.Release();
-                if (devAdr.ContainsKey("7021") && devAdr.ContainsKey("7044") && devAdr.ContainsKey("7018"))
+                System.Threading.Thread.Sleep(100);
+                if (devAdr.ContainsKey("7021") && devAdr.ContainsKey("7044") && devAdr.ContainsKey("7018P"))
                 {
                     AddInputHistoryMessage("Модули найдены\n", outputEcho);
                     return true;
