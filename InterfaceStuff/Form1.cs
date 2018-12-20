@@ -18,7 +18,7 @@ namespace InterfaceStuff
         private SerialPort comport = new SerialPort();
         private ManualResetEvent buffFull = new ManualResetEvent(false);
         private Semaphore semaphore = new Semaphore(1, 1);
-        private volatile byte[] dataBuffer;
+        private volatile String dataBuffer;
         private String[] baudRates = { "9600" };//хз надо ли другие. если попросит добавим
         private Dictionary<string, string> devAdr = new Dictionary<string, string>();
         private int defaultWaitTime = 700;
@@ -37,9 +37,13 @@ namespace InterfaceStuff
 
         private void port_DataRecived(object sender, SerialDataReceivedEventArgs e)
         {
-            System.Threading.Thread.Sleep(200);
-            dataBuffer = new byte[comport.BytesToRead];
-            comport.Read(dataBuffer, 0, dataBuffer.Length);
+            dataBuffer = "";
+            char curSymb = (char)comport.ReadChar();
+            while (curSymb != (char)0x0D)
+            {
+                dataBuffer += curSymb;
+                curSymb = (char)comport.ReadChar();
+            }
             comport.DiscardOutBuffer();
             buffFull.Set();//должно быть норм.хз чебудет если set на уже открытый эвент вызвать. так то у нас всегда есть while
         }
