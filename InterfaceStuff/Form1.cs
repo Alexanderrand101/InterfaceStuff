@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Threading;
 using System.Collections;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace InterfaceStuff
 {
@@ -32,7 +33,7 @@ namespace InterfaceStuff
             baudRate.Items.AddRange(baudRates);
             baudRate.SelectedIndex = 0;
             comport.DataReceived += new SerialDataReceivedEventHandler(port_DataRecived);
-            chart1.Series[0].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            exponGraph.Series[0].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
         }
 
         private void port_DataRecived(object sender, SerialDataReceivedEventArgs e)
@@ -419,21 +420,30 @@ namespace InterfaceStuff
             return (i < 10) ? (char)(i + '0') : (char)(i - 10 + 'A');
         }
 
-        private void update(double[] values)//графикообновитель
+        private void update(double[] values, Chart chart)//графикообновитель
         {
-            chart1.Series[0].Points.Clear();
+            chart.Series[0].Points.Clear();
             for (int i = 0; i < values.Length; i++)
-                chart1.Series[0].Points.AddXY(i,values[i]);
+                chart.Series[0].Points.AddXY(i,values[i]);
         }
 
-   
-        private void button5_Click(object sender, EventArgs e)//нахер не надо, но потестить рисовалду прикольно
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
-            Random rand = new Random();
-            double[] array = new double[rand.Next(50)];            
-            for (int i = 0; i < array.Length; i++)
-                array[i] = rand.Next(10);
-            update(array);
+
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if(checkBox1.Checked)
+            {
+                button1.Visible = true;
+                rawInput.ReadOnly = false;
+            }
+            else
+            {
+                button1.Visible = false;
+                rawInput.ReadOnly = true;
+            }
         }
     }
 }
